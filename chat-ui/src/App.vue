@@ -1,30 +1,26 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div>
-  <router-view />
+    <router-view username="lolocomotive" />
 </template>
-
+<script lang="ts">
+import { defineComponent } from 'vue';
+export default defineComponent({
+    name: 'App',
+});
+</script>
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+@import '@/_variables';
+body {
+    font-family: Lato, sans-serif;
+    margin: 0;
 }
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
+::-webkit-scrollbar {
+    background: $color1;
+    width: 7px;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: $color3;
+    border-radius: 50px;
 }
 </style>
