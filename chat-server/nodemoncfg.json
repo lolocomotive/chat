@@ -1,0 +1,4 @@
+{
+    "e": ["ts"],
+    "exec": "npx ts-node ./app.ts"
+}
