@@ -33,15 +33,16 @@ export default defineComponent({
 });
 </script>
 <style lang="scss">
+@use "sass:color";
 @import '@/_variables.scss';
 #messages {
     display: flex;
     flex-direction: column;
-    border: solid $color1 1pt;
-    background-color: white;
+    box-shadow: 0 0 10px 1px color.scale($color3, $alpha: -50%);
+    border-radius: 20px;
     padding: 10px;
     padding-right: 5px;
-
+    flex: 1;
     overflow: auto;
     > div {
         overflow: auto;

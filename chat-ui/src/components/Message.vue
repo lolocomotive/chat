@@ -14,6 +14,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { useI18n } from 'vue-i18n';
 function daysBetween(first: Date, second: Date) {
     // Copy date parts of the timestamps, discarding the time parts.
     var one = new Date(first.getFullYear(), first.getMonth(), first.getDate());
@@ -33,6 +34,14 @@ function daysBetween(first: Date, second: Date) {
 }
 
 export default defineComponent({
+    name: 'Message',
+    setup() {
+        const { t } = useI18n({
+            inheritLocale: true,
+            useScope: 'local',
+        });
+        return { t };
+    },
     props: {
         username: String,
         content: String,
@@ -205,19 +214,21 @@ export default defineComponent({
                 var day = '';
                 var offset = daysBetween(date, now);
                 if (offset == 0) {
-                    day = 'Today';
+                    day = this.t('today');
                 } else if (offset == 1) {
-                    day = 'Yesterday';
+                    day = this.t('yesterday');
                 } else if (offset == 2) {
-                    day = 'Two days ago';
+                    day = this.t('two-days-ago');
                 } else if (offset == 3) {
-                    day = 'Three days ago';
+                    day = this.t('three-days-ago');
                 } else {
                     day = `${date.getDate()}.${date.getMonth()}.${
                         date.getFullYear() - 2000
                     }`;
                 }
-                return day + ' at ' + date.getHours() + ':' + date.getMinutes();
+                return `${day} ${this.t(
+                    'at'
+                )} ${date.getHours()}:${date.getMinutes()}`;
             } else return '';
         },
     },
@@ -242,3 +253,28 @@ export default defineComponent({
     }
 }
 </style>
+<i18n>
+{
+    "fr":{
+        "today": "Aujourd'hui",
+        "yesterday": "Hier",
+        "two-days-ago": "Avant-hier",
+        "three-days-ago": "Il y a trois jours",
+        "at": "à"
+    },
+    "en":{
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "two-days-ago": "Two days ago",
+        "three-days-ago": "Three days ago",
+        "at": "at"
+    },
+    "de":{
+        "today": "Heute",
+        "yesterday": "Gestern",
+        "two-days-ago": "Vorgestern",
+        "three-days-ago": "Vor drei Tagen",
+        "at": "um"
+    }
+}
+</i18n>
