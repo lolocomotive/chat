@@ -1,5 +1,5 @@
 import { Http2ServerRequest, Http2ServerResponse } from 'node:http2';
-import { QueryResult } from 'pg';
+import { Query, QueryResult } from 'pg';
 import bcrypt from 'bcrypt';
 import { pwd_read } from './db_users/pwd_read';
 
@@ -8,8 +8,8 @@ var http = require('http');
  *localhost:5000/login
  *|-> Login
  *
- *localhost:5000/register
- *|-> Register
+ *localhost:5000/messages
+ *|-> query all messages
  *
  *etc...
  */
@@ -21,6 +21,17 @@ http.createServer(function (req: Http2ServerRequest, res: Http2ServerResponse) {
 
     let responseRaw: any[] = [];
     switch (req.url) {
+        case '/messages':
+            pwd_read.query(
+                `select content,username,date from messages join users on messages.userid = users.id order by messages.id asc;`,
+                (err: Error, results: QueryResult) => {
+                    if (err) throw err;
+
+                    res.end(JSON.stringify(results.rows));
+                }
+            );
+
+            break;
         case '/login':
             /*
              *    Handle Login
@@ -48,13 +59,16 @@ http.createServer(function (req: Http2ServerRequest, res: Http2ServerResponse) {
 
                 //! If the user exists
                 await pwd_read.query(
-                    `select * from users where username='${credentials.username}'`,
+                    `select pwd_hash from users where username='${credentials.username}'`,
                     (err: Error, results: QueryResult) => {
                         if (err) {
                             throw err;
                         }
                         if (results.rowCount > 0) {
                             //! If the password is correct
+                            console.log(
+                                bcrypt.hashSync(credentials.password, 10)
+                            );
                             if (
                                 bcrypt.compareSync(
                                     credentials.password,
@@ -64,11 +78,11 @@ http.createServer(function (req: Http2ServerRequest, res: Http2ServerResponse) {
                                 response.status = 'authorized';
                             } else {
                                 response.status = 'unauthorized';
-                                response.message = 'Wrong password!';
+                                response.message = 'wrongpass';
                             }
                         } else {
                             response.status = 'unauthorized';
-                            response.message = 'No such user';
+                            response.message = 'nouser';
                         }
                         switch (response.status) {
                             case 'authorized':
@@ -92,5 +106,39 @@ http.createServer(function (req: Http2ServerRequest, res: Http2ServerResponse) {
         default:
             res.end(JSON.stringify({ message: 'Invalid request URL' }));
     }
-}).listen(5000);
-console.log('Listening on port 5000');
+}).listen(3000);
+console.log('REST API listening on port 3000');
+
+var socketServer = http.createServer();
+const io = require('socket.io')(socketServer, {
+    cors: {
+        origin: '*',
+    },
+});
+io.on('connection', (socket: any) => {
+    console.log('A user has connected');
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+    socket.on(
+        'msg',
+        async (message: {
+            username: string;
+            content: string;
+            date: string;
+        }) => {
+            var query = `insert into messages(userid, content, date) values(1, '${message.content.replace(
+                /\'/g,
+                "''"
+            )}','${message.date}');`;
+            console.log(query);
+            await pwd_read.query(query, (err: Error, results: QueryResult) => {
+                if (err) throw err;
+                io.emit('msg', message);
+            });
+        }
+    );
+});
+
+socketServer.listen(3001);
+console.log('Websocket server listening on port 3001');

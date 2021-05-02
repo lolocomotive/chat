@@ -17,3 +17,9 @@ where username = 'lolocomotive';
  */
 insert into messages(userid, content)
 values(1, 'Henlo fren');
+insert into messages(userid, content, date)
+values(
+        1,
+        '\'\\\'\\{}${}\'\\"""""\\',
+        'Sun May 02 2021 15:33:32 GMT+0200 (Central European Summer Time)'
+    );
