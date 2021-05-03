@@ -2,6 +2,16 @@ import { Http2ServerRequest, Http2ServerResponse } from 'node:http2';
 import { Query, QueryResult } from 'pg';
 import bcrypt from 'bcrypt';
 import { pwd_read } from './db_users/pwd_read';
+import { v4 as uuid } from 'uuid';
+import { Socket } from 'socket.io';
+type SessionData = {
+    sessionID: string;
+    authorized: boolean;
+    username: string;
+    userid: number;
+};
+
+let users: SessionData[] = [];
 
 var http = require('http');
 /*
@@ -52,14 +62,19 @@ http.createServer(function (req: Http2ServerRequest, res: Http2ServerResponse) {
                         credentials.password +
                         '"'
                 );
-                let response: { status: string; message: string } = {
+                let response: {
+                    status: string;
+                    message: string;
+                    sessionID: string;
+                } = {
                     status: '',
                     message: '',
+                    sessionID: '',
                 };
 
                 //! If the user exists
                 await pwd_read.query(
-                    `select pwd_hash from users where username='${credentials.username}'`,
+                    `select pwd_hash,id from users where username='${credentials.username}'`,
                     (err: Error, results: QueryResult) => {
                         if (err) {
                             throw err;
@@ -76,6 +91,14 @@ http.createServer(function (req: Http2ServerRequest, res: Http2ServerResponse) {
                                 )
                             ) {
                                 response.status = 'authorized';
+                                response.sessionID = uuid();
+                                users.push({
+                                    sessionID: response.sessionID,
+                                    username: credentials.username as string,
+                                    authorized: true,
+                                    userid: parseInt(results.rows[0].id),
+                                });
+                                console.log(users);
                             } else {
                                 response.status = 'unauthorized';
                                 response.message = 'wrongpass';
@@ -115,7 +138,7 @@ const io = require('socket.io')(socketServer, {
         origin: '*',
     },
 });
-io.on('connection', (socket: any) => {
+io.on('connection', (socket: Socket) => {
     console.log('A user has connected');
     socket.on('disconnect', () => {
         console.log('user disconnected');
@@ -126,11 +149,20 @@ io.on('connection', (socket: any) => {
             username: string;
             content: string;
             date: string;
+            sessionID: string;
         }) => {
-            var query = `insert into messages(userid, content, date) values(1, '${message.content.replace(
-                /\'/g,
-                "''"
-            )}','${message.date}');`;
+            var session = getSession(message.sessionID);
+            if (
+                session == undefined ||
+                session.authorized == undefined ||
+                !session.authorized
+            ) {
+                socket.emit('error', 'unauthorized');
+                return;
+            }
+            var query = `insert into messages(userid, content, date) values(${
+                session.userid
+            }, '${message.content.replace(/\'/g, "''")}','${message.date}');`;
             console.log(query);
             await pwd_read.query(query, (err: Error, results: QueryResult) => {
                 if (err) throw err;
@@ -139,6 +171,8 @@ io.on('connection', (socket: any) => {
         }
     );
 });
-
+function getSession(sessionID: string): SessionData {
+    return users.filter((user) => user.sessionID === sessionID)[0];
+}
 socketServer.listen(3001);
 console.log('Websocket server listening on port 3001');

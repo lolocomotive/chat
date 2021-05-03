@@ -5,6 +5,12 @@
                 {{ t('chatting-as') }}
                 <span class="username">{{ username }}</span>
             </h1>
+            <div v-if="isErrored" class="error-msg">
+                {{ t(error) }}
+                <router-link v-if="error === t('unauthorized')" to="/">{{
+                    t('connect')
+                }}</router-link>
+            </div>
             <Messages :messages="messages" />
             <MsgEditor @send="sendMsg" />
         </div>
@@ -19,6 +25,7 @@ import socket from '@/socket';
 type message = {
     content: string;
     username: string;
+    sessionID: string;
     date: string;
 };
 export default defineComponent({
@@ -32,17 +39,27 @@ export default defineComponent({
     },
     props: {
         username: String,
+        sessionID: String,
     },
-    data(): { messages: message[] } {
+    data(): { messages: message[]; error: string; isErrored: boolean } {
         return {
             messages: [],
+            error: '',
+            isErrored: false,
         };
     },
     created(): void {
+        if (this.sessionID == '') this.$router.push('/');
         this.update();
         socket.connect();
         socket.on('msg', (message) => {
-            console.log(this.messages.push(message));
+            this.messages.push(message);
+            this.scroll();
+        });
+        socket.on('error', (error) => {
+            console.log(`An error has occured! \n${this.t(error)}`);
+            this.error = this.t(error);
+            this.isErrored = true;
             this.scroll();
         });
     },
@@ -67,6 +84,7 @@ export default defineComponent({
                 content: msg,
                 username: this.username as string,
                 date: new Date().toString(),
+                sessionID: this.sessionID,
             };
             socket.emit('msg', msgWithData);
             /* fetch(`http://${api}/messages`, {
@@ -105,6 +123,22 @@ $flax: #e3d081ff;
         max-width: 800px;
         height: calc(100vh - 80px);
         overflow: hidden;
+        .error-msg {
+            margin: 20px;
+            padding: 10px;
+            box-shadow: 0 0 10px 1px $error;
+            color: $color2;
+            text-align: center;
+            background: $error;
+            border-radius: 100px;
+            font-size: 1.5em;
+
+            a {
+                color: white;
+                display: block;
+                font-size: 0.7em;
+            }
+        }
     }
     background: $color3;
     background: linear-gradient(45deg, $color3, $color1);
@@ -123,7 +157,9 @@ h1 {
 <i18n>
 {
     "fr": {
-        "chatting-as": "Vous êtes "
+        "chatting-as": "Vous êtes ",
+        "unauthorized": "Vous n'êtes pas connecté!",
+        "connect": "Se connecter"
     },
     "de": {
         "chatting-as": "Sie sind "

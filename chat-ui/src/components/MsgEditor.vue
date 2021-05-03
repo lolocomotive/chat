@@ -38,7 +38,6 @@ export default defineComponent({
             event.preventDefault();
             event.stopPropagation();
             var el = document.getElementById('msg-input') as HTMLInputElement;
-            console.log(el.value);
             this.$emit('send', el.value);
             el.value = '';
         },

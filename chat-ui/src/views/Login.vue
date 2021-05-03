@@ -72,6 +72,11 @@ export default defineComponent({
                 .then((res) => res.json())
                 .then((data) => {
                     if (data.status === 'authorized') {
+                        this.$emit(
+                            'login',
+                            credentials.username,
+                            data.sessionID
+                        );
                         this.$router.push('chat');
                     } else {
                         this.error = true;

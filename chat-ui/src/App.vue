@@ -1,10 +1,34 @@
 <template>
-    <router-view username="lolocomotive" />
+    <router-view
+        @login="setUserData"
+        :username="username"
+        :sessionID="sessionID"
+    />
 </template>
 <script lang="ts">
+import { useI18n } from 'vue-i18n';
 import { defineComponent } from 'vue';
 export default defineComponent({
     name: 'App',
+    setup() {
+        const { t } = useI18n({
+            inheritLocale: true,
+            useScope: 'local',
+        });
+        return { t };
+    },
+    data() {
+        return {
+            sessionID: '',
+            username: '',
+        };
+    },
+    methods: {
+        setUserData(username: string, sessionID: string) {
+            this.username = username;
+            this.sessionID = sessionID;
+        },
+    },
 });
 </script>
 <style lang="scss">
