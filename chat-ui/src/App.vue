@@ -1,4 +1,5 @@
 <template>
+    <CookieDeclaration v-if="showCookieDeclaration" />
     <router-view
         @login="setUserData"
         :username="username"
@@ -8,6 +9,8 @@
 <script lang="ts">
 import { useI18n } from 'vue-i18n';
 import { defineComponent } from 'vue';
+import CookieDeclaration from '@/components/CookieDeclaration.vue';
+import cookies from '@/cookies';
 export default defineComponent({
     name: 'App',
     setup() {
@@ -19,7 +22,7 @@ export default defineComponent({
     },
     data() {
         return {
-            sessionID: '',
+            sessionID: cookies.getCookie('sessionID'),
             username: '',
         };
     },
@@ -27,6 +30,30 @@ export default defineComponent({
         setUserData(username: string, sessionID: string) {
             this.username = username;
             this.sessionID = sessionID;
+            try {
+                if (JSON.parse(cookies.getCookie('allowedCookies'))) {
+                    cookies.setCookie('sessionID', sessionID, 1 / 24);
+                }
+            } catch (err) {
+                console.log(
+                    'Cookies have been disabled, your login will not be saved'
+                );
+            }
+        },
+    },
+    components: {
+        CookieDeclaration,
+    },
+    computed: {
+        showCookieDeclaration() {
+            try {
+                var cookiesAllowed = JSON.parse(
+                    cookies.getCookie('allowedCookies')
+                ).cookiesAllowed;
+                return !cookiesAllowed;
+            } catch (err) {
+                return true;
+            }
         },
     },
 });
