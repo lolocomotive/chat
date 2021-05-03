@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:osb="http://www.openswatchbook.org/uri/2009/osb" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="210mm" height="297mm" viewBox="0 0 210 297" version="1.1" id="svg8">
+   <defs id="defs2">
+      <linearGradient id="linearGradient3271">
+         <stop style="stop-color:#91c7b1;stop-opacity:1;" offset="0" id="stop3267" />
+         <stop style="stop-color:#156064;stop-opacity:1" offset="1" id="stop3269" />
+      </linearGradient>
+      <linearGradient id="linearGradient3263">
+         <stop style="stop-color:#91c7b1;stop-opacity:1" offset="0" id="stop3259" />
+         <stop style="stop-color:#f1f7ed;stop-opacity:1" offset="1" id="stop3261" />
+      </linearGradient>
+      <linearGradient id="linearGradient2799" osb:paint="solid">
+         <stop style="stop-color:#f1f7ed;stop-opacity:1;" offset="0" id="stop2797" />
+      </linearGradient>
+      <linearGradient xlink:href="#linearGradient3263" id="linearGradient3265" x1="116.4593" y1="82.435951" x2="48.80682" y2="11.631881" gradientUnits="userSpaceOnUse" />
+      <linearGradient xlink:href="#linearGradient3271" id="linearGradient3273" x1="118.51895" y1="75.220299" x2="18.167606" y2="-13.090632" gradientUnits="userSpaceOnUse" />
+   </defs>
+   <metadata id="metadata5">
+      <rdf:RDF>
+         <cc:Work rdf:about="">
+            <dc:format>image/svg+xml</dc:format>
+            <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+            <dc:title></dc:title>
+         </cc:Work>
+      </rdf:RDF>
+   </metadata>
+   <g id="layer1">
+      <rect style="fill:url(#linearGradient3273);fill-opacity:1;fill-rule:evenodd;stroke-width:3.165;stroke:#91c7b1;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none" id="rect10" width="66.52533" height="39.544353" x="38.514053" y="13.228255" ry="12.853007" />
+      <rect style="fill:url(#linearGradient3265);fill-opacity:1;fill-rule:evenodd;stroke:#156064;stroke-width:3.165;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;opacity:1" id="rect839" width="66.52533" height="39.544353" x="49.989681" y="22.918324" ry="12.853007" />
+      <rect style="opacity:1;fill:#156064;fill-opacity:1;fill-rule:evenodd;stroke:#156064;stroke-width:3.165;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" id="rect3275" width="46.182396" height="0.926202" x="-106.83324" y="32.723988" ry="0.463101" transform="scale(-1,1)" />
+      <rect style="opacity:1;fill:#156064;fill-opacity:1;fill-rule:evenodd;stroke:#156064;stroke-width:3.165;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" id="rect3277" width="46.182396" height="0.926202" x="-107.10461" y="52.785091" ry="0.463101" transform="scale(-1,1)" />
+      <rect style="opacity:1;fill:#156064;fill-opacity:1;fill-rule:evenodd;stroke:#156064;stroke-width:3.165;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" id="rect3279" width="46.182396" height="0.926202" x="-106.68119" y="42.203129" ry="0.463101" transform="scale(-1,1)" />
+   </g>
+</svg>

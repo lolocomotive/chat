@@ -55,13 +55,6 @@ http.createServer(function (req: Http2ServerRequest, res: Http2ServerResponse) {
                     username: String;
                     password: String;
                 } = JSON.parse(body.toString());
-                console.log(
-                    'Identifying user "' +
-                        credentials.username +
-                        '" using password "' +
-                        credentials.password +
-                        '"'
-                );
                 let response: {
                     status: string;
                     message: string;
@@ -98,7 +91,6 @@ http.createServer(function (req: Http2ServerRequest, res: Http2ServerResponse) {
                                     authorized: true,
                                     userid: parseInt(results.rows[0].id),
                                 });
-                                console.log(users);
                             } else {
                                 response.status = 'unauthorized';
                                 response.message = 'wrongpass';
@@ -106,19 +98,6 @@ http.createServer(function (req: Http2ServerRequest, res: Http2ServerResponse) {
                         } else {
                             response.status = 'unauthorized';
                             response.message = 'nouser';
-                        }
-                        switch (response.status) {
-                            case 'authorized':
-                                console.log('User has been authorized');
-                                break;
-                            case 'unauthorized':
-                                console.log(
-                                    'The access has been denied to the user for reason:',
-                                    response.message
-                                );
-                                break;
-                            default:
-                                console.log('UNKNOWN STATUS!');
                         }
                         res.end(JSON.stringify(response));
                     }
@@ -139,10 +118,6 @@ const io = require('socket.io')(socketServer, {
     },
 });
 io.on('connection', (socket: Socket) => {
-    console.log('A user has connected');
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
     socket.on(
         'msg',
         async (message: {
@@ -163,7 +138,6 @@ io.on('connection', (socket: Socket) => {
             var query = `insert into messages(userid, content, date) values(${
                 session.userid
             }, '${message.content.replace(/\'/g, "''")}','${message.date}');`;
-            console.log(query);
             await pwd_read.query(query, (err: Error, results: QueryResult) => {
                 if (err) throw err;
                 io.emit('msg', message);
