@@ -32,14 +32,44 @@ http.createServer(function (req: Http2ServerRequest, res: Http2ServerResponse) {
     let responseRaw: any[] = [];
     switch (req.url) {
         case '/messages':
-            pwd_read.query(
-                `select content,username,date from messages join users on messages.userid = users.id order by messages.id asc;`,
-                (err: Error, results: QueryResult) => {
-                    if (err) throw err;
+            req.on('data', (chunk) => {
+                responseRaw.push(chunk);
+            }).on('end', async () => {
+                var body = Buffer.concat(responseRaw);
+                let sessionID = JSON.parse(body.toString()).sessionID;
+                let session = getSession(sessionID);
+                if (session != undefined) {
+                    if (session.authorized) {
+                        pwd_read.query(
+                            `select content,username,date from messages join users on messages.userid = users.id order by messages.id asc;`,
+                            (err: Error, results: QueryResult) => {
+                                if (err) throw err;
 
-                    res.end(JSON.stringify(results.rows));
+                                res.end(
+                                    JSON.stringify({
+                                        status: 'authorized',
+                                        messages: results.rows,
+                                        username: session.username,
+                                    })
+                                );
+                            }
+                        );
+                    } else {
+                        res.end(
+                            JSON.stringify({
+                                status: 'unauthorized',
+                                username: session.username,
+                            })
+                        );
+                    }
+                } else {
+                    res.end(
+                        JSON.stringify({
+                            status: 'disconnected',
+                        })
+                    );
                 }
-            );
+            });
 
             break;
         case '/login':

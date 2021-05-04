@@ -1,6 +1,7 @@
 <template>
     <CookieDeclaration v-if="showCookieDeclaration" />
     <router-view
+        @updateUname="updateUname"
         @login="setUserData"
         :username="username"
         :sessionID="sessionID"
@@ -39,6 +40,9 @@ export default defineComponent({
                     'Cookies have been disabled, your login will not be saved'
                 );
             }
+        },
+        updateUname(uname: string) {
+            this.username = uname;
         },
     },
     components: {

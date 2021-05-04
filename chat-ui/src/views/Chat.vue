@@ -7,9 +7,12 @@
             </h1>
             <div v-if="isErrored" class="error-msg">
                 {{ t(error) }}
-                <router-link v-if="error === t('unauthorized')" to="/">{{
-                    t('connect')
-                }}</router-link>
+                <router-link
+                    @click="clearSessionId"
+                    v-if="error === t('unauthorized')"
+                    to="/"
+                    >{{ t('connect') }}</router-link
+                >
             </div>
             <Messages :messages="messages" />
             <MsgEditor @send="sendMsg" />
@@ -22,6 +25,7 @@ import MsgEditor from '@/components/MsgEditor.vue';
 import { useI18n } from 'vue-i18n';
 import { defineComponent } from 'vue';
 import socket from '@/socket';
+import cookies from '@/cookies';
 type message = {
     content: string;
     username: string;
@@ -57,13 +61,14 @@ export default defineComponent({
             this.scroll();
         });
         socket.on('error', (error) => {
-            console.log(`An error has occured! \n${this.t(error)}`);
             this.error = this.t(error);
             this.isErrored = true;
-            this.scroll();
         });
     },
     methods: {
+        clearSessionId() {
+            cookies.setCookie('sessionID', '', 0);
+        },
         scroll() {
             requestAnimationFrame(() => {
                 var messages = document.getElementById('messages')?.children[0];
@@ -72,11 +77,28 @@ export default defineComponent({
         },
         update() {
             var api = 'localhost:3000';
-            fetch(`http://${api}/messages`)
+            fetch(`http://${api}/messages`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    sessionID: this.sessionID,
+                }),
+            })
                 .then((res) => res.json())
                 .then((data) => {
-                    this.messages = data;
-                    this.scroll();
+                    switch (data.status) {
+                        case 'authorized':
+                            this.messages = data.messages;
+                            this.scroll();
+                            this.$emit('updateUname', data.username);
+                            break;
+                        case 'unauthorized':
+                            this.$emit('updateUname', data.username);
+                            break;
+                        case 'disconnected':
+                            this.clearSessionId();
+                            this.$router.push('/');
+                            break;
+                    }
                 });
         },
         sendMsg(msg: string): void {

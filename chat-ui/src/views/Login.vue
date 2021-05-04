@@ -8,12 +8,14 @@
                 type="text"
                 name="uname-input"
                 id="uname-input"
+                autocomplete="username"
             />
             <input
                 :placeholder="t('form.password')"
                 type="password"
                 name="password-input"
                 id="password-input"
+                autocomplete="current-password"
             />
             <input type="submit" :value="t('form.login')" :onclick="login" />
         </form>
@@ -23,6 +25,7 @@
 <script lang="ts">
 import { useI18n } from 'vue-i18n';
 import { defineComponent } from 'vue';
+import cookies from '@/cookies';
 export default defineComponent({
     name: 'Home',
     data() {
@@ -33,7 +36,13 @@ export default defineComponent({
             inheritLocale: true,
             useScope: 'local',
         });
+
         return { t };
+    },
+    created() {
+        if (cookies.getCookie('sessionID') !== '') {
+            this.$router.push('/chat');
+        }
     },
     methods: {
         login(event: Event): void {
