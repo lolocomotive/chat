@@ -92,8 +92,6 @@ export default defineComponent({
             }
             var cookieBg = document.getElementById('cookie-bg');
             cookieBg?.remove();
-            console.log(cookieBg);
-            //if (cookieBg != null) cookieBg.style.display = 'none';
         },
         updateBoxes() {
             var cookiesEnabled = (document.getElementById(
